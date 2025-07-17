@@ -16,7 +16,7 @@ export const prisma =
   new PrismaClient({
     // Opcional: puedes descomentar la siguiente línea para ver las consultas de Prisma en la consola,
     // lo cual es muy útil para depurar.
-    log: ['query', 'info', 'warn', 'error'],
+    // log: ['query', 'info', 'warn', 'error'],
   });
 
 // En entornos que no son de producción, asignamos la instancia de Prisma al objeto global.
