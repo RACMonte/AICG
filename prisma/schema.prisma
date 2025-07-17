@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model alumno {
+  id           Int            @id @default(autoincrement())
+  nombre       String         @db.VarChar(255)
+  correo       String         @unique @db.VarChar(255)
+  evaluaciones evaluaciones[]
+}
+
+model carrera {
+  id          Int           @id @default(autoincrement())
+  nombre      String        @db.VarChar(255)
+  codigo      String        @unique @db.VarChar(50)
+  competencia competencia[]
+  modulo      modulo[]
+}
+
+model competencia {
+  id         Int     @id @default(autoincrement())
+  id_carrera Int
+  codigo_pde Int?
+  nombre     String  @db.VarChar(500)
+  carrera    carrera @relation(fields: [id_carrera], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  saber      saber[]
+}
+
+model empresa {
+  id         Int          @id @default(autoincrement())
+  rut        String       @unique @db.VarChar(50)
+  nombre     String       @db.VarChar(255)
+  rubro      String?      @db.VarChar(255)
+  supervisor supervisor[]
+}
+
+model entregable {
+  id      Int     @id @default(autoincrement())
+  archivo String? @db.VarChar(255)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ev_puntaje {
+  id_evaluacion    Int
+  id_itemrubrica   Int
+  puntaje_obtenido Float?
+  aplica           Boolean?
+  evaluaciones     evaluaciones @relation(fields: [id_evaluacion], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  item_rubrica     item_rubrica @relation(fields: [id_itemrubrica], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([id_evaluacion, id_itemrubrica]) 
+}
+
+model evaluaciones {
+  id                  Int          @id @default(autoincrement())
+  id_modulo           Int
+  id_evaluador        Int
+  id_rubrica          Int
+  id_alumno           Int
+  puntuacion_obtenido Float?
+  nota                Float?
+  ev_puntaje          ev_puntaje[]
+  alumno              alumno       @relation(fields: [id_alumno], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  evaluador           evaluador    @relation(fields: [id_evaluador], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  modulo              modulo       @relation(fields: [id_modulo], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  rubrica             rubrica      @relation(fields: [id_rubrica], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model evaluador {
+  id            Int            @id @default(autoincrement())
+  id_profesor   Int?
+  id_supervisor Int?
+  tipo          tipo_evaluador
+  evaluaciones  evaluaciones[]
+  profesor      profesor?      @relation(fields: [id_profesor], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  supervisor    supervisor?    @relation(fields: [id_supervisor], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model item_rubrica {
+  id           Int          @id @default(autoincrement())
+  id_rubrica   Int
+  item_titulo  String       @db.VarChar(255)
+  item_descrip String?
+  puntaje_max  Int?
+  id_saber     Int?
+  ev_puntaje   ev_puntaje[]
+  rubrica      rubrica      @relation(fields: [id_rubrica], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_item_rubrica_rubrica")
+  saber        saber?       @relation(fields: [id_saber], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_item_rubrica_saber")
+}
+
+model modulo {
+  id           Int              @id @default(autoincrement())
+  id_mic       Int?
+  id_mdic      Int?
+  tipo_modulo  tipo_modulo_enum
+  id_carrera   Int
+  evaluaciones evaluaciones[]
+  carrera      carrera          @relation(fields: [id_carrera], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  modulo_mdic  modulo_mdic?     @relation(fields: [id_mdic], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  modulo_mic   modulo_mic?      @relation(fields: [id_mic], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model modulo_mdic {
+  id      Int      @id @default(autoincrement())
+  nombre  String   @db.VarChar(255)
+  periodo String?  @db.VarChar(20)
+  codigo  String   @unique @db.VarChar(50)
+  modulo  modulo[]
+}
+
+model modulo_mic {
+  id      Int       @id @default(autoincrement())
+  nombre  String    @db.VarChar(255)
+  periodo DateTime? @db.Date
+  codigo  String    @unique @db.VarChar(50)
+  modulo  modulo[]
+}
+
+model profesor {
+  id        Int         @id @default(autoincrement())
+  nombre    String      @db.VarChar(255)
+  correo    String      @db.VarChar(255)
+  evaluador evaluador[]
+}
+
+model rubrica {
+  id           Int            @id @default(autoincrement())
+  rubrica      String?        @db.VarChar(255)
+  periodo      String?        @db.VarChar(10)
+  nombre_rub   String?        @db.VarChar(50)
+  evaluaciones evaluaciones[]
+  item_rubrica item_rubrica[]
+}
+
+model saber {
+  id             Int            @id @default(autoincrement())
+  id_competencia Int
+  descripcion    String?
+  item_rubrica   item_rubrica[]
+  competencia    competencia    @relation(fields: [id_competencia], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model supervisor {
+  id         Int         @id @default(autoincrement())
+  id_empresa Int
+  nombre     String      @db.VarChar(255)
+  correo     String      @db.VarChar(255)
+  cargo      String?     @db.VarChar(255)
+  telefono   String?     @db.VarChar(20)
+  evaluador  evaluador[]
+  empresa    empresa     @relation(fields: [id_empresa], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum tipo_evaluador {
+  P
+  S
+}
+
+enum tipo_modulo_enum {
+  MDIC
+  MIC
+}
