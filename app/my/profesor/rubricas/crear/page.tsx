@@ -11,7 +11,7 @@ export default async function PaginaCrearRubrica() {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6">Crear Nueva Rúbrica</h1>
+      <h1 className="text-black font-bold mb-8">Crear Nueva Rúbrica</h1>
       {/* Renderizamos el formulario y le pasamos la lista de saberes */}
       <CrearRubricaForm saberes={saberes} />
     </div>

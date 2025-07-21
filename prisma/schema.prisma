@@ -44,7 +44,6 @@ model entregable {
   archivo String? @db.VarChar(255)
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model ev_puntaje {
   id_evaluacion    Int
   id_itemrubrica   Int

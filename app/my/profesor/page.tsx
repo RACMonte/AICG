@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { prisma } from '@/app/lib/prisma';
 import { eliminarRubrica } from '@/app/actions';
+import { DeleteButton } from '@/app/ui/DeleteButton';
 
 // Esta página es un Componente de Servidor, por lo que puede ser async
 export default async function GestionarRubricasPage() {
@@ -18,7 +19,7 @@ export default async function GestionarRubricasPage() {
         {/* 1. Botón para Crear: Redirecciona a la página que ya construimos */}
         <Link 
           href="/my/profesor/rubricas/crear" 
-          className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700"
+          className="px-4 py-2 bg-blue-600 text-black font-semibold rounded-md hover:bg-blue-700"
         >
           Crear Nueva Rúbrica
         </Link>
@@ -58,21 +59,9 @@ export default async function GestionarRubricasPage() {
                     </Link>
 
                     {/* 3. Formulario para Borrar: Llama a la Server Action */}
-                    <form action={eliminarRubrica}>
-                      <input type="hidden" name="id" value={rubrica.id} />
-                      <button 
-                        type="submit" 
-                        className="text-red-600 hover:text-red-800 font-medium"
-                        // Opcional: Añadir una confirmación antes de borrar
-                        onClick={(e) => {
-                          if (!confirm('¿Estás seguro de que quieres eliminar esta rúbrica y todos sus datos asociados? Esta acción no se puede deshacer.')) {
-                            e.preventDefault();
-                          }
-                        }}
-                      >
-                        Borrar
-                      </button>
-                    </form>
+                    <td>
+                      <DeleteButton rubricaId={rubrica.id} />
+                    </td>
                   </div>
                 </td>
               </tr>
